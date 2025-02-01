@@ -32,8 +32,8 @@ create_new_directory(FOLDER_Name)
 
 # Absolute Path To The Directory/Folder You Want To Search
 # Also Listing All The Files On That Folder
-source_path = "D:\Photos\IPHONE PHOTOS".replace('\\', '/')
-destination = f"D:\Photos\IPHONE PHOTOS\{FOLDER_Name}".replace('\\', '/')
+source_path = "path".replace('\\', '/')
+destination = f"path\{FOLDER_Name}".replace('\\', '/')
 DIRECTORY = os.listdir(source_path)
 
 
