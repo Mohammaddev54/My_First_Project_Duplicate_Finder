@@ -12,9 +12,9 @@ def hash_file(file_path, algorithm="md5"):
 def duplicate_checker(file1, file2):
     return True if file1 == file2 else False
 
-#  "D:\\Photos\\photo\\DCIM\\Camera"
 
-DIRECTORY_PATH = "E:\\Programming\\pictures"
+
+DIRECTORY_PATH = ""
 DIRCTORY = os.listdir(DIRECTORY_PATH)
 i = 0
 
