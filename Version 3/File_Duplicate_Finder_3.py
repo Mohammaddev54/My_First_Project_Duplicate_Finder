@@ -33,7 +33,7 @@ def create_new_directory(name):
 # Absolute Path To The Directory/Folder You Want To Search
 # Also Listing All The Files On That Folder
 source_path = os.getcwd()
-'''destination = f"D:/Photos/the broken phone/DCIM/{FOLDER_Name}"
+'''destination = f"path/{FOLDER_Name}"
 os.chdir(source_path)
 DIRECTORY = os.listdir(source_path)
 
