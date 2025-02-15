@@ -1,7 +1,6 @@
 """
 Project: Duplicate searching application,
-Version: 5,
-This program is intented to run on the same Directory as it is scanning which isn't good.
+Version: 5
 """
 
 # Necessary Modules
