@@ -1,6 +1,7 @@
 """
 Project: Duplicate searching application,
-Version: 3,
+Version: 4,
+This program is intented to run on the same Directory as it is scanning which isn't good.
 """
 
 # Necessary Modules
@@ -14,12 +15,15 @@ def hash_file(file_path, algorithm="md5"):
     if not os.path.isfile(file_path):
         return None
     else:
-        with open(file_path, 'rb') as file:
-            while chunk:= file.read(8192):
-                hash_obj.update(chunk)
-            return hash_obj.hexdigest()
+        try:
+            with open(file_path, 'rb') as file:
+                while chunk:= file.read(8192):
+                    hash_obj.update(chunk)
+                return hash_obj.hexdigest()
+        except Exceptions as error:
+            print(f"Experienced: {error} while trying to hash the file!")
 
-# Creating Duplicate folder
+# Duplicate folder creator function
 def create_new_directory(name):
     if not os.path.exists(name):
         try:
@@ -37,8 +41,9 @@ create_new_directory(FOLDER_Name)
 
 # Absolute Path To The Directory/Folder You Want To Search
 # Also Listing All The Files On That Folder
-source_path = "".replace('\\', '/')
-destination = f"{source_path}\\{FOLDER_Name}".replace('\\', '/')
+source_path = input("address: ")
+source_path = str(source_path).replace('\\', '/')
+destination = f"{source_path}/{FOLDER_Name}"
 DIRECTORY = os.listdir(source_path)
 
 
@@ -47,10 +52,10 @@ DIRECTORY = os.listdir(source_path)
 i = 0
 hashes = {}
 
-# Main
 
 # try w/ except Block Of Code To Catch Any Errors That May Occur
 try:
+    # Main
     # Going Through All The Files And Checking If It Already Exists In hashes Dictionary
     for f in DIRECTORY:
             i += 1
