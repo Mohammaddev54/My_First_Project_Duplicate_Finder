@@ -18,7 +18,8 @@ class Extend_Duplicate_Finder_GUI(Duplicate_Finder_GUI):
     def __init__(self):
         super().__init__()
         self.root.bind("<Escape>", lambda event: self.root.destroy())
-        self.root.bind("<Return>", lambda event: self.search_button_action())
+        '''Enabling Searching action by pressing (Return/Enter) key on Keyboard. --NOT RECOMENDED RIGHT NOW-- '''
+        #self.root.bind("<Return>", lambda event: self.search_button_action())
         
         self.source = None
         self.destination = None
