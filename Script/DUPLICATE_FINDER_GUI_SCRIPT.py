@@ -33,9 +33,9 @@ class Duplicate_Finder_GUI():
         self.source_entry.grid(     row = 0, column = 1, ipadx= 5, ipady = 5)
         self.destination_entry.grid(row = 1, column = 1, ipadx= 5, ipady = 5)
         
-        self.search_button      =    Button(self.top_frame, text="Search", pady = 5, padx = 5, font= (14), command = self.btn_search_action)
-        self.undo_button        =     Button(self.bottom_frame, text="Undo", pady = 5, padx = 5, font= (14), command = self.btn_undo_action)
-        self.cancel_button      = Button(self.bottom_frame, text="Cancel", pady = 5, padx = 5, font= (14), command = self.btn_cancel_action)
+        self.search_button      =    Button(self.top_frame, text="Search", pady = 5, padx = 5, font= (14), command = self.search_button_action)
+        self.undo_button        =     Button(self.bottom_frame, text="Undo", pady = 5, padx = 5, font= (14), command = self.undo_button_action)
+        self.cancel_button      = Button(self.bottom_frame, text="Cancel", pady = 5, padx = 5, font= (14), command = self.cancel_button_action)
         
         self.search_button.grid(           row = 2, column = 0)
         self.undo_button.grid(  row = 0, column = 0, padx = 10)
