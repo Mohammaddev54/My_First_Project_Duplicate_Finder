@@ -1,3 +1,7 @@
+'''
+GUI setup script for duplicate Searching application.
+'''
+
 from tkinter import *
 from tkinter import ttk
 
