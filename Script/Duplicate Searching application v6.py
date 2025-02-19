@@ -9,7 +9,7 @@ from DUPLICATE_FINDER_GUI_SCRIPT import Duplicate_Finder_GUI
 from My_Functions import my_functions as func
 from threading import Thread, Event
 from os import path, listdir
-from tkinter import *
+
 
 
 class Extend_Duplicate_Finder_GUI(Duplicate_Finder_GUI):
