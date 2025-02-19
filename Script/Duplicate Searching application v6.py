@@ -1,83 +1,71 @@
 """
 Project: Duplicate searching application,
-Version: 6
+Version: 6,
+DUPLICATE_FINDER_GUI_SCRIPT should be in the same Directory/Folder with Duplicate Searching application script
 """
 
 # Necessary Modules
 from DUPLICATE_FINDER_GUI_SCRIPT import Duplicate_Finder_GUI
+from My_Functions import my_functions as func
 from threading import Thread
 from os import path, listdir
-from tkinter import ttk, messagebox
 from tkinter import *
-import hashlib
 
 
 class Extend_Duplicate_Finder_GUI(Duplicate_Finder_GUI):
-    
-    
     def __init__(self):
         super().__init__()
         self.root.bind("<Escape>", lambda event: self.root.destroy())
-        '''Enabling Searching action by pressing (Return/Enter) key on Keyboard. --NOT RECOMENDED RIGHT NOW-- '''
-        #self.root.bind("<Return>", lambda event: self.search_button_action())
+        self.root.bind("<Return>", lambda event: self.search_button_action())
         
+        # Global Variable
         self.source = None
         self.destination = None
     
     
-    # Error Info Window
-    def error_messagebox(self, error):
-        messagebox.showinfo("ERROR", error)
-    
-    
-    def function_hash(self, file_path, algorithm="md5"):
-        hash_object = hashlib.new(algorithm)
-        try:
-            with open(file_path, "rb") as file:
-                while chunk:= file.read(8192):
-                    hash_object.update(chunk)
-            return hash_object.hexdigest()
-        except Exception as error:
-            self.error_messagebox(error)
-    
-    # Missing code Function
-    def not_implemented(self, location):
-        try:
-            raise NotImplementedError("Code Missing...")
-        except NotImplementedError as e:
-            print(f"{location}: {e}")
-    
     # Main
     def start_scanning(self, folder_name):
-        print(f"Scanning {folder_name} Directory!")
         files = listdir(self.source)
         x = []
-        for self.file_name in files:
-            self.file_name_path = path.join(self.source, self.file_name)
+        print(f"Scanning ({folder_name}) Directory!")
+        if not files:
+            print(f"{folder_name} is Empty")
+            print("--------------------"*5)
+            self.search_button.config(state="normal")
+            return
+        for file_name in files:
+            self.file_name_path = path.join(self.source, file_name)
             if not path.isfile(self.file_name_path):
-                print(f"Folder detected: {path.basename(self.file_name_path)}")
                 continue
-            self.hash_key = self.function_hash(self.file_name_path)
+            self.hash_key = func.function_hash(self.file_name_path)
             if self.hash_key not in x:
+                print(f"{self.hash_key}: {file_name}")
                 x.append(self.hash_key)
             else:
-                print(f"{self.hash_key}: {self.file_name} is a duplicate!")
+                func.move_func(f"{self.source}/{file_name}", self.destination)
         else:
-            print("Task completed!")
+            self.root.bind("<Return>", lambda event: self.search_button_action())
+            self.search_button.config(state="normal")
+            print("--------------------"*5)
     
-    # Fetching Input Info
-    def get_input_information(self):
-        data = [self.source_entry, self.destination_entry]
-        self.source, self.destination = list(datum.get().replace("\\", '/') if datum != '' else None for datum in data)
-        if path.exists(self.source) is False:
-            self.error_messagebox("Invalid Source")
-        else:
-            self.search_button.config(state="disabled")
-            self.start_scanning(path.basename(self.source))
     
     # Search button Function
     def search_button_action(self):
-        self.get_input_information()
+        data = [self.source_entry, self.destination_entry]
+        self.source, self.destination = [datum.get().replace("\\", '/') \
+            if datum.get() != '' else "" for datum in data]
+        
+        if path.exists(self.source) is False:
+            func.show_error("Invalid Source")
+        else:
+            if self.destination == "":
+                func.create_folder(self.source)
+                self.destination = f"{self.source}/Dupelicates"
+            self.root.unbind("<Return>")
+            self.search_button.config(state="disabled")
+            thread_1 = Thread(target=self.start_scanning, \
+                args=(path.basename(self.source),), daemon = True)
+            # self.start_scanning(path.basename(self.source))
         
     # Undo button Function
     def undo_button_action(self):
