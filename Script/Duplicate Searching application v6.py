@@ -7,7 +7,7 @@ DUPLICATE_FINDER_GUI_SCRIPT should be in the same Directory/Folder with Duplicat
 # Necessary Modules
 from DUPLICATE_FINDER_GUI_SCRIPT import Duplicate_Finder_GUI
 from My_Functions import my_functions as func
-from threading import Thread
+from threading import Thread, Event
 from os import path, listdir
 from tkinter import *
 
@@ -18,40 +18,57 @@ class Extend_Duplicate_Finder_GUI(Duplicate_Finder_GUI):
         self.root.bind("<Escape>", lambda event: self.root.destroy())
         self.root.bind("<Return>", lambda event: self.search_button_action())
         
-        # Global Variable
+        # Instance Variables
         self.source = None
         self.destination = None
+        self.stop_event = Event()
     
     
     # Main
     def start_scanning(self, folder_name):
-        files = listdir(self.source)
+        
         x = []
+        files = listdir(self.source)
         print(f"Scanning ({folder_name}) Directory!")
+        
+        # If Folder is empty stop
         if not files:
             print(f"{folder_name} is Empty")
             print("--------------------"*5)
             self.search_button.config(state="normal")
             return
-        for file_name in files:
-            self.file_name_path = path.join(self.source, file_name)
-            if not path.isfile(self.file_name_path):
-                continue
-            self.hash_key = func.function_hash(self.file_name_path)
-            if self.hash_key not in x:
-                print(f"{self.hash_key}: {file_name}")
-                x.append(self.hash_key)
-            else:
-                func.move_func(f"{self.source}/{file_name}", self.destination)
         else:
-            self.root.bind("<Return>", lambda event: self.search_button_action())
-            self.search_button.config(state="normal")
-            print("--------------------"*5)
+            # scan process
+            for file_name in files:
+                
+                if self.stop_event.is_set():
+                    print("thread stopped")
+                    break
+                    
+                self.file_name_path = path.join(self.source, file_name)
+                
+                if not path.isfile(self.file_name_path):
+                    print(f"FOLDER: {file_name}")
+                    continue
+                
+                self.hash_key = func.function_hash(self.file_name_path)
+                
+                if self.hash_key not in x:
+                    print(f"{self.hash_key}: {file_name}")
+                    x.append(self.hash_key)
+                else:
+                    func.move_func(f"{self.source}/{file_name}", self.destination)
+            
+            else:
+                self.root.bind("<Return>", lambda event: self.search_button_action())
+                self.search_button.config(state="normal")
+                print("--------------------"*5)
     
     
-    # Search button Function
+    # Search button's Function
     def search_button_action(self):
-        data = [self.source_entry, self.destination_entry]
+        data = (self.source_entry, self.destination_entry)
+        
         self.source, self.destination = [datum.get().replace("\\", '/') \
             if datum.get() != '' else "" for datum in data]
         
@@ -63,18 +80,24 @@ class Extend_Duplicate_Finder_GUI(Duplicate_Finder_GUI):
                 self.destination = f"{self.source}/Dupelicates"
             self.root.unbind("<Return>")
             self.search_button.config(state="disabled")
+            
+            self.stop_event.clear()
+            
             thread_1 = Thread(target=self.start_scanning, \
                 args=(path.basename(self.source),), daemon = True)
-            # self.start_scanning(path.basename(self.source))
-        
-    # Undo button Function
-    def undo_button_action(self):
-        self.not_implemented("btn_undo_action")
+            
+            thread_1.start()
     
     # Cancel button Function
     def cancel_button_action(self):
-        self.not_implemented("btn_cancel_action")
-
+        self.stop_event.set()
+        print("cancel clicked")
+        self.search_button.config(state="normal")
+        self.root.bind("<Return>")
+    
+    # Undo button Function
+    def undo_button_action(self):
+        self.not_implemented("btn_undo_action")
 
 # Initializing Window
 window = Extend_Duplicate_Finder_GUI()
