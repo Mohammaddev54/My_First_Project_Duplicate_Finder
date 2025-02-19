@@ -2,8 +2,7 @@
 GUI setup script for duplicate Searching application.
 '''
 
-from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, Tk, Label, Entry, Button
 
 class Duplicate_Finder_GUI():
     def __init__(self, root=None):
@@ -56,5 +55,6 @@ class Duplicate_Finder_GUI():
         pass
 
 if __name__ == "__main__":
+    print("RUNNING GUI SCRIPT in terminal")
     window = Duplicate_Finder_GUI()
     window.root.mainloop()
