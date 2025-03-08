@@ -13,7 +13,7 @@ class my_functions:
     
     # Info window
     def show_info(info):
-        messagebox.showinfo(f"Tip: {info}")
+        messagebox.showinfo("INFO", info)
     
     # ERROR window
     def show_error(error):
@@ -28,7 +28,7 @@ class my_functions:
         try:
             move(file_path, destination_path)
         except Exception as error:
-            error_messagebox(error)
+            my_functions.show_error(error)
     
     # Hashing Function
     def function_hash(file_path, algorithm="md5"):
@@ -39,7 +39,7 @@ class my_functions:
                     hash_object.update(chunk)
             return hash_object.hexdigest()
         except Exception as error:
-            self.error_messagebox(error)
+            my_functions.show_error(error)
     
     # Missing code Function
     def not_implemented(self, location):
