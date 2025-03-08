@@ -12,5 +12,4 @@ want with them most likely Just deleting them.
 If the (Optional) second input is Empty the program will create a "Duplicates" Directory/Folder in the same Folder it is searching in.
 
 ### State of the project:
-On Going!
-
+Completed.
