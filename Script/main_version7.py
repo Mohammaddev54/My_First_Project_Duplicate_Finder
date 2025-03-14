@@ -2,6 +2,7 @@
 Author/Programmer: https://github.com/Mohammaddev54/Mohammaddev54
 Project: Duplicate Searching Application
 Version: 8
+ 
 Description of changes made:
 - I've tried to implement the SRP(Single Responsibilty Principle)
 - The cancel_button & undo_button functions' have been removed going to be added later
@@ -45,18 +46,16 @@ class window(win):
         return self.destination_path
     
     # Activate a Button on Screen
-    @staticmethod
-    def activate_button(button_name):
+    def activate_button(self, button_name):
         button_name.config(state="normal")
 
     # Deactivate a Button on Screen
-    @staticmethod
-    def deactivate_button(button_name):
+    def deactivate_button(self, button_name):
         button_name.config(state="disabled")
 
     # Activate a keyboard key    
     def activate_key(self, key_name):
-        self.root.bind(key_name)
+        self.root.bind(key_name, lambda event: self.search_button_action())
     
     # Deactivate a keyboard key
     def deactivate_key(self, key_name):
@@ -64,28 +63,57 @@ class window(win):
     
     # Search button's Function
     def search_button_action(self):
+        # Get data from entry/input boxes
         data = (self.source_entry, self.destination_entry)
         self.source_path = data[0].get().strip().replace("\\", "/")
         self.source_path = self.source_path if self.source_path else "N\\A"
         self.destination_path = data[1].get().strip().replace("\\", '/')
         self.destination_path = self.destination_path if self.destination_path else "N\\A"
         
-        self.deactivate_key("<Return>")
-        window.deactivate_button(self.search_button)
-        window.activate_button(self.cancel_button)
-        files = listdir(self.source_path)
-        
-        if file_handler.file_check_list(self.source_path):
-            if not file_handler.check_for_valid_path(self.destination_path):
-                file_handler.create_folder(self.source_path, folder_name="Duplicates")
-            run = lambda files: duplicate_finder_app.run(self, files)
-            thread_manager.create_thread("main_process", run, (files,))
+        # Backend
+        duplicate_finder_app.run(self)
+    
+    # Cancel button's Function
+    def cancel_button_action(self):
+        raise NotImplementedError
 
 class duplicate_finder_app():
-    @staticmethod
-    def run(self, files):
-        duplicate_scanner.process(self, files)
-
+    '''These are some Pre running checks that user inputs/source_path
+    & destination_path go through before running the program!'''
+    # This try-except block is for unknown errors that can occur
+    try:
+        # run the main process
+        @staticmethod
+        def run(self):
+            # Throw and error if the source path is not valid
+            if not file_handler.check_for_valid_path(self.source_path):
+                window.show_error(f"Invalid source path: {self.source_path}")
+            
+            else:
+                
+                self.deactivate_key("<Return>")
+                self.deactivate_button(self.search_button)
+                self.activate_button(self.cancel_button)
+                
+                # Checking if destination is valid
+                if not file_handler.check_for_valid_path(self.destination_path):
+                    file_handler.create_folder(self.source_path, folder_name="Duplicates")
+                    
+                    # Doing some more checks on source path
+                    if file_handler.file_check_list(self.source_path):
+                        files = listdir(self.source_path)
+                    process = lambda files: duplicate_finder_app.process(self, files)
+                    thread_manager.create_thread("main_process", process, (files,))
+        
+        # main process app
+        @staticmethod
+        def process(self, files):
+            duplicate_scanner.process(self, files)
+            self.activate_key("<Return>")
+            self.activate_button(self.search_button)
+    except Exception as error:
+        window.show_error(error)
+# File creation, moving...
 class file_handler():
     
     # Move Function
@@ -122,10 +150,7 @@ class file_handler():
     
     @staticmethod
     def file_check_list(file_path):
-        if not file_handler.check_for_valid_path(file_path):
-            print("Invalid Path")
-            return False
-        elif file_handler.check_for_empty_folder(file_path):
+        if file_handler.check_for_empty_folder(file_path):
             print("empty folder")
             return False
         elif not file_handler.is_file_folder(file_path):
@@ -133,7 +158,7 @@ class file_handler():
             return False
         else:
             return True
-
+# Scanning for duplicates
 class duplicate_scanner():
     
     # Hashing Function
@@ -177,7 +202,7 @@ class duplicate_scanner():
                         file_handler.move_func(file_name_path, destination_path)
         else:
             print("Process Ended!")
-
+# Manage, Create, Start, Stop a thread
 class thread_manager():
     
     stop_event = Event()
@@ -199,6 +224,7 @@ class thread_manager():
     def get_thread(thread_name):
         return thread_manager.thread_dictionary[thread_name]
     
-
+# if it is run on terminal
 if __name__ == "__main__":
-    window()
+    Window = window()
+    Window.root.mainloop()
