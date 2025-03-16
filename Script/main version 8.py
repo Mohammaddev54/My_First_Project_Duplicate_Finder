@@ -4,11 +4,9 @@ Project: Duplicate Searching Application
 Version: 8
  
 Description of changes made:
-- I've tried to implement the SRP(Single Responsibilty Principle)
-- The cancel_button & undo_button functions' have been removed going to be added later
-- Refactoring all code
-- Variable name changes
-- In total I would say Improvements on structure of the script
+- Added Functionality to undo button
+- Implemented which buttons are active at same time
+- may have made the script a little unreadable
 """
 
 from gui_script import win
@@ -18,6 +16,7 @@ from tkinter import messagebox
 from shutil import move
 import hashlib
 
+# Window
 class window(win):
     # Initialize winodow
     def __init__(self):
@@ -71,12 +70,18 @@ class window(win):
         self.destination_path = self.destination_path if self.destination_path else "N\\A"
         
         # Backend
-        duplicate_finder_app.run(self)
+        duplicate_finder_app.run(self, False)
     
     # Cancel button's Function
     def cancel_button_action(self):
-        raise NotImplementedError
+        thread_manager.stop_event.set()
+        self.activate_button(self.undo_button)
+    
+    # Undo button's Function
+    def undo_button_action(self):
+        duplicate_finder_app.run(self, True)
 
+# App
 class duplicate_finder_app():
     '''These are some Pre running checks that user inputs/source_path
     & destination_path go through before running the program!'''
@@ -84,38 +89,54 @@ class duplicate_finder_app():
     try:
         # run the main process
         @staticmethod
-        def run(self):
-            # Throw and error if the source path is not valid
-            if not file_handler.check_for_valid_path(self.source_path):
-                window.show_error(f"Invalid source path: {self.source_path}")
-            
-            else:
-                
-                self.deactivate_key("<Return>")
+        def run(self, undo):
+            """Wanting to add undo button's action function"""
+            if undo:
+                files = listdir(self.destination_path)
                 self.deactivate_button(self.search_button)
-                self.activate_button(self.cancel_button)
+                self.deactivate_key("<Return>")
+                undoing = lambda files: duplicate_finder_app.undo_run_process(self, files)
+                thread_manager.create_thread("UNDO_PROCESS", undoing, (files,))
+            else:
+                # Throw and error if the source path is not valid
+                if not file_handler.check_for_valid_path(self.source_path):
+                    window.show_error(f"Invalid source path: {self.source_path}")
                 
-                # Checking if destination is valid
-                if not file_handler.check_for_valid_path(self.destination_path):
-                    file_handler.create_folder(self.source_path, folder_name="Duplicates")
+                else:
                     
-                    # Doing some more checks on source path
-                    if file_handler.file_check_list(self.source_path):
-                        files = listdir(self.source_path)
-                    process = lambda files: duplicate_finder_app.process(self, files)
-                    thread_manager.create_thread("main_process", process, (files,))
+                    self.deactivate_key("<Return>")
+                    self.deactivate_button(self.undo_button)
+                    self.deactivate_button(self.search_button)
+                    self.activate_button(self.cancel_button)
+                    # Checking if destination is valid
+                    if not file_handler.check_for_valid_path(self.destination_path):
+                        file_handler.create_folder(self.source_path, folder_name="Duplicates")
+                        
+                        # Doing some more checks on source path
+                        if file_handler.file_check_list(self.source_path):
+                            files = listdir(self.source_path)
+                        process = lambda files: duplicate_finder_app.process(self, files)
+                        thread_manager.create_thread("main_process", process, (files,))
         
-        # main process app
+        #UNDO
+        @staticmethod
+        def undo_run_process(self, files):
+            duplicate_scanner.undo_process(self, files)
+            self.activate_key("<Return>")
+            self.activate_button(self.search_button)
+
+        # scanning process to start
         @staticmethod
         def process(self, files):
             duplicate_scanner.process(self, files)
             self.activate_key("<Return>")
             self.activate_button(self.search_button)
+            self.deactivate_button(self.cancel_button)
     except Exception as error:
         window.show_error(error)
+
 # File creation, moving...
 class file_handler():
-    
     # Move Function
     @staticmethod
     def move_func(file_path, destination_path):
@@ -158,6 +179,7 @@ class file_handler():
             return False
         else:
             return True
+
 # Scanning for duplicates
 class duplicate_scanner():
     
@@ -172,6 +194,24 @@ class duplicate_scanner():
             return hash_object.hexdigest()
         except Exception as error:
             window.show_error(error)
+    
+    @staticmethod
+    def undo_process(self, files):
+        for file_name in files:
+            # ONLY HAPPENS WHEN CANCEL IS CLICKED
+            if thread_manager.stop_event.is_set():
+                thread_manager.stop_event.clear()
+                self.activate_key("<Return>")
+                self.activate_button(self.search_button)
+                break
+            else:
+                source_path = self.get_destination_path()
+                destination_path = self.get_source_path()
+                file_name_path = path.join(source_path, file_name)
+                print(f"{file_name} moved back!")
+                file_handler.move_func(file_name_path, destination_path)
+        else:
+            print("Undo process Ended!")
     
     @staticmethod
     def process(self, files):
@@ -201,7 +241,9 @@ class duplicate_scanner():
                         print(f"{file_name} moved!")
                         file_handler.move_func(file_name_path, destination_path)
         else:
+            self.activate_button(self.undo_button)
             print("Process Ended!")
+
 # Manage, Create, Start, Stop a thread
 class thread_manager():
     
@@ -223,7 +265,7 @@ class thread_manager():
     @staticmethod
     def get_thread(thread_name):
         return thread_manager.thread_dictionary[thread_name]
-    
+
 # if it is run on terminal
 if __name__ == "__main__":
     Window = window()
