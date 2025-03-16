@@ -18,3 +18,7 @@ Complete
 - Searching for Duplicates in a folder excluding Sub-directories
 - Undo to move all files back to original Directory
 - Cancel during action
+
+### Plans for future
+- May add more features later in the future
+- Currently would like to create another project and learn more about programming
