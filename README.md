@@ -12,4 +12,9 @@ want with them most likely Just deleting them.
 If the (Optional) second input is Empty the program will create a "Duplicates" Directory/Folder in the same Folder it is searching in.
 
 ### State of the project:
-Changes being made but mostly Complete.
+Complete
+
+### Features
+- Searching for Duplicates in a folder excluding Sub-directories
+- Undo to move all files back to original Directory
+- Cancel during action
