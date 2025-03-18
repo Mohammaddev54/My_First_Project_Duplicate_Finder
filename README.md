@@ -5,10 +5,18 @@ This is the first big Python project I have taken unto myself to learn programmi
 ### Goal of this project:
 Creating a Free to use Duplication Scanning application and Learning from the challenges of this project I faced.
 
-### What this program does:
-It can take two inputs: One required and one optional, The first input is the absolute path to the folder / Directory of where you want to search for duplicated files; (Optional) second input is the destination so that the program knows where to move all the duplicated files so you can do what ever you
-want with them most likely Just deleting them.
-If the (Optional) second input is Empty the program will create a "Duplicates" Directory/Folder in the same Folder it is searching in.
+### Program description:
+This program takes 2 inputs: source_path, and sestination_path. source_path is required and destination_path is optional.
+source_path would be an absolute path to where you want scanned example: D:/grand_parent/parent/child. destination_path is (Optional); Defaults to same Directory in a Folder called (Duplicates).
+Sudo of sudocode of what program does with inputs:
+  check_for_valid(source_path)
+  for file in source_path:
+    do some checks on file
+    hash_the_file(file)
+    if not in some_Dictionary.keys():
+     continue
+    else:
+      move file to destination_path
 
 ### State of the project:
 Complete
