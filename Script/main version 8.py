@@ -118,7 +118,6 @@ class duplicate_finder_app():
                         process = lambda files: duplicate_finder_app.process(self, files)
                         thread_manager.create_thread("main_process", process, (files,))
         
-        #UNDO
         @staticmethod
         def undo_run_process(self, files):
             duplicate_scanner.undo_process(self, files)
