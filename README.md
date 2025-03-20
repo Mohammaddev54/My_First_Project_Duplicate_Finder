@@ -9,14 +9,16 @@ Creating a Free to use Duplication Scanning application and Learning from the ch
 This program takes 2 inputs: source_path, and sestination_path. source_path is required and destination_path is optional.
 source_path would be an absolute path to where you want scanned example: D:/grand_parent/parent/child. destination_path is (Optional); Defaults to same Directory in a Folder called (Duplicates).
 Sudo of sudocode of what program does with inputs:
-  check_for_valid(source_path)
+  ```python
+check_for_valid(source_path)
   for file in source_path:
     do some checks on file
-    hash_the_file(file)
-    if not in some_Dictionary.keys():
+    data = hash_the_file(file)
+    if data not in some_Dictionary.keys():
      continue
     else:
       move file to destination_path
+```
 
 ### State of the project:
 Complete
